@@ -24,11 +24,11 @@ public class User {
         this.gender = gender;
     }
 
-    public Long getId() {
+    public Long getUserId() {
         return user_id;
     }
 
-    public void setId(Long user_id) {
+    public void setUserId(Long user_id) {
         this.user_id = user_id;
     }
 

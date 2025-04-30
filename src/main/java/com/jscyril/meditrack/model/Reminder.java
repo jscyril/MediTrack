@@ -2,14 +2,20 @@ package com.jscyril.meditrack.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 public class Reminder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private LocalDateTime reminderTime;
+    @Column(name = "reminder_id")
+    private Long reminderId;
+    @Column(name = "reminder_description")
+    private String reminderDescription;
+    @Column(name = "start_date")
+    private LocalDate startDate;
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -22,26 +28,43 @@ public class Reminder {
     public Reminder() {
     }
 
-    public Reminder(LocalDateTime reminderTime, User user, Medicine medicine) {
-        this.reminderTime = reminderTime;
+    public Reminder(String reminderDescription, User user, Medicine medicine, LocalDate startDate, LocalDate endDate) {
         this.user = user;
         this.medicine = medicine;
+        this.reminderDescription = reminderDescription;
+        this.startDate = startDate;
+        this.endDate = endDate;
+
     }
 
-    public Long getId() {
-        return id;
+    public Long getReminderId() {
+        return reminderId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setReminderId(Long reminderId) {
+        this.reminderId = reminderId;
     }
 
-    public LocalDateTime getReminderTime() {
-        return reminderTime;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setReminderTime(LocalDateTime reminderTime) {
-        this.reminderTime = reminderTime;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getReminderDescription(){
+        return reminderDescription;
+    }
+    public void setReminderDescription(String reminderDescription){
+        this.reminderDescription = reminderDescription;
     }
 
     public User getUser() {
