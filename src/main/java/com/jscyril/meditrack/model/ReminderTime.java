@@ -1,6 +1,8 @@
 package com.jscyril.meditrack.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalTime;
 
@@ -10,7 +12,9 @@ public class ReminderTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reminder_time_id")
     private Long reminderTimeId;
+    @Positive
     private int dosage;
+    @NotNull
     @Column(name = "time_of_day")
     private LocalTime timeOfDay;
 

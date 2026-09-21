@@ -11,7 +11,7 @@
 ## Next
 
 - [x] Add reminder CRUD
-- [ ] Add reminder times
+- [x] Add reminder times
 - [ ] Add stock tracking
 - [ ] Add health-log CRUD
 - [ ] Replace generated Spring Security auth with real user authentication/JWT
