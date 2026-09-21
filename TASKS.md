@@ -17,6 +17,6 @@
 - [x] Replace generated authentication with password-backed HTTP Basic
 - [x] Add JWT authentication
 - [x] Add endpoint integration coverage
-- [ ] Move database credentials to environment configuration
+- [x] Move database credentials to environment configuration
 - [ ] Add scheduling/notifications
 - [ ] Add a frontend

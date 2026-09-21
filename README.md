@@ -19,3 +19,17 @@ Meditrack is a Spring Boot backend for a medicine reminder app. It provides REST
 - PostgreSQL
 - Maven
 - Lombok
+
+## Configuration
+
+Set these environment variables before running against PostgreSQL:
+
+```text
+DATABASE_URL=jdbc:postgresql://localhost:5433/meditrack
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=your-password
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRATION_SECONDS=3600
+```
+
+Tests use an in-memory H2 database automatically.
