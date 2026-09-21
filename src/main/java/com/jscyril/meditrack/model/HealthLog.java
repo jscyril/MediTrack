@@ -12,6 +12,7 @@ public class HealthLog {
 
     private LocalDateTime logTime;
     private String logType;
+    @Column(name = "log_value")
     private String value;
 
     @ManyToOne

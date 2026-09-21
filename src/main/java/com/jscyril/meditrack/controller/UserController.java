@@ -2,6 +2,7 @@ package com.jscyril.meditrack.controller;
 
 import com.jscyril.meditrack.model.User;
 import com.jscyril.meditrack.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         return userService.createUser(user);
     }
 

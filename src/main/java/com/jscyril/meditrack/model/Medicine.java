@@ -1,6 +1,7 @@
 package com.jscyril.meditrack.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Entity
@@ -9,6 +10,7 @@ public class Medicine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "medicineId")
     private Long medicineId;
+    @NotBlank
     private String medicineName;
     private String description;
 

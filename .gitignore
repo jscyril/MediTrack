@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### AI tooling (local-only) ###
+.agents/
+.codex/
+.claude/
+.cursor/
+.windsurf/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
