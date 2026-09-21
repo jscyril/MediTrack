@@ -1,5 +1,6 @@
 package com.jscyril.meditrack;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ApiIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void userCanRegisterLoginAndCreateMedicine() throws Exception {
@@ -54,5 +58,44 @@ class ApiIntegrationTests {
 
         mockMvc.perform(get("/api/med"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void usersCannotReadEachOthersHealthLogs() throws Exception {
+        String firstToken = registerAndLogin("owner-" + System.nanoTime());
+        String secondToken = registerAndLogin("other-" + System.nanoTime());
+
+        mockMvc.perform(post("/api/health-logs")
+                        .header("Authorization", "Bearer " + firstToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"logTime":"2026-09-21T10:00:00","logType":"blood-pressure","value":"120/80"}
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/health-logs")
+                        .header("Authorization", "Bearer " + secondToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    private String registerAndLogin(String username) throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"%s","email":"%s@example.com","password":"secret123"}
+                                """.formatted(username, username)))
+                .andExpect(status().isOk());
+
+        String body = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"%s","password":"secret123"}
+                                """.formatted(username)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        return objectMapper.readTree(body).get("token").asText();
     }
 }

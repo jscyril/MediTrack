@@ -20,34 +20,38 @@ public class ReminderService {
     private final ReminderRepository reminderRepository;
     private final UserRepository userRepository;
     private final MedRepository medRepository;
+    private final CurrentUserService currentUserService;
 
     public ReminderService(ReminderRepository reminderRepository, UserRepository userRepository,
-                           MedRepository medRepository) {
+                           MedRepository medRepository, CurrentUserService currentUserService) {
         this.reminderRepository = reminderRepository;
         this.userRepository = userRepository;
         this.medRepository = medRepository;
+        this.currentUserService = currentUserService;
     }
 
     public Reminder create(ReminderRequest request) {
-        return reminderRepository.save(toReminder(request));
+        return reminderRepository.save(toReminder(request, currentUserService.get()));
     }
 
     public List<Reminder> findAll() {
-        return reminderRepository.findAll();
+        return reminderRepository.findAllByUser(currentUserService.get());
     }
 
     public Optional<Reminder> findById(Long id) {
-        return reminderRepository.findById(id);
+        return reminderRepository.findByReminderIdAndUser(id, currentUserService.get());
     }
 
     public List<Reminder> findDueOn(LocalDate date) {
-        return reminderRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date);
+        return reminderRepository.findByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                currentUserService.get(), date, date);
     }
 
     public Reminder update(Long id, ReminderRequest request) {
-        return reminderRepository.findById(id)
+        User user = currentUserService.get();
+        return reminderRepository.findByReminderIdAndUser(id, user)
                 .map(reminder -> {
-                    Reminder updated = toReminder(request);
+                    Reminder updated = toReminder(request, user);
                     reminder.setReminderDescription(updated.getReminderDescription());
                     reminder.setStartDate(updated.getStartDate());
                     reminder.setEndDate(updated.getEndDate());
@@ -59,16 +63,14 @@ public class ReminderService {
     }
 
     public boolean delete(Long id) {
-        if (!reminderRepository.existsById(id)) {
+        if (findById(id).isEmpty()) {
             return false;
         }
         reminderRepository.deleteById(id);
         return true;
     }
 
-    private Reminder toReminder(ReminderRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    private Reminder toReminder(ReminderRequest request, User user) {
         Medicine medicine = medRepository.findById(request.medicineId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicine not found"));
         return new Reminder(request.description(), user, medicine, request.startDate(), request.endDate());

@@ -9,7 +9,6 @@ public record ReminderRequest(
         @NotBlank String description,
         @NotNull LocalDate startDate,
         @NotNull LocalDate endDate,
-        @NotNull Long userId,
         @NotNull Long medicineId
 ) {
 }

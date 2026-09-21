@@ -16,28 +16,32 @@ import java.util.Optional;
 public class HealthLogService {
     private final HealthLogRepository healthLogRepository;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public HealthLogService(HealthLogRepository healthLogRepository, UserRepository userRepository) {
+    public HealthLogService(HealthLogRepository healthLogRepository, UserRepository userRepository,
+                            CurrentUserService currentUserService) {
         this.healthLogRepository = healthLogRepository;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public HealthLog create(HealthLogRequest request) {
-        return healthLogRepository.save(toHealthLog(request));
+        return healthLogRepository.save(toHealthLog(request, currentUserService.get()));
     }
 
     public List<HealthLog> findAll() {
-        return healthLogRepository.findAll();
+        return healthLogRepository.findAllByUser(currentUserService.get());
     }
 
     public Optional<HealthLog> findById(Long id) {
-        return healthLogRepository.findById(id);
+        return healthLogRepository.findByIdAndUser(id, currentUserService.get());
     }
 
     public HealthLog update(Long id, HealthLogRequest request) {
-        return healthLogRepository.findById(id)
+        User user = currentUserService.get();
+        return healthLogRepository.findByIdAndUser(id, user)
                 .map(healthLog -> {
-                    HealthLog updated = toHealthLog(request);
+                    HealthLog updated = toHealthLog(request, user);
                     healthLog.setLogTime(updated.getLogTime());
                     healthLog.setLogType(updated.getLogType());
                     healthLog.setValue(updated.getValue());
@@ -48,16 +52,14 @@ public class HealthLogService {
     }
 
     public boolean delete(Long id) {
-        if (!healthLogRepository.existsById(id)) {
+        if (findById(id).isEmpty()) {
             return false;
         }
         healthLogRepository.deleteById(id);
         return true;
     }
 
-    private HealthLog toHealthLog(HealthLogRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    private HealthLog toHealthLog(HealthLogRequest request, User user) {
         return new HealthLog(request.logTime(), request.logType(), request.value(), user);
     }
 }

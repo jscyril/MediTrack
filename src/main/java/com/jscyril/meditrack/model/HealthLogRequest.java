@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record HealthLogRequest(
         @NotNull LocalDateTime logTime,
         @NotBlank String logType,
-        @NotBlank String value,
-        @NotNull Long userId
+        @NotBlank String value
 ) {
 }

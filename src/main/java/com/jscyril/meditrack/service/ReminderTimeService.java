@@ -16,10 +16,13 @@ import java.util.Optional;
 public class ReminderTimeService {
     private final ReminderTimeRepository reminderTimeRepository;
     private final ReminderRepository reminderRepository;
+    private final CurrentUserService currentUserService;
 
-    public ReminderTimeService(ReminderTimeRepository reminderTimeRepository, ReminderRepository reminderRepository) {
+    public ReminderTimeService(ReminderTimeRepository reminderTimeRepository, ReminderRepository reminderRepository,
+                               CurrentUserService currentUserService) {
         this.reminderTimeRepository = reminderTimeRepository;
         this.reminderRepository = reminderRepository;
+        this.currentUserService = currentUserService;
     }
 
     public ReminderTime create(ReminderTimeRequest request) {
@@ -27,15 +30,19 @@ public class ReminderTimeService {
     }
 
     public List<ReminderTime> findAll() {
-        return reminderTimeRepository.findAll();
+        return reminderTimeRepository.findAllByReminder_User(currentUserService.get());
     }
 
     public Optional<ReminderTime> findById(Long id) {
-        return reminderTimeRepository.findById(id);
+        return reminderTimeRepository.findById(id)
+                .filter(reminderTime -> reminderTime.getReminder().getUser().getUserId()
+                        .equals(currentUserService.get().getUserId()));
     }
 
     public ReminderTime update(Long id, ReminderTimeRequest request) {
         return reminderTimeRepository.findById(id)
+                .filter(reminderTime -> reminderTime.getReminder().getUser().getUserId()
+                        .equals(currentUserService.get().getUserId()))
                 .map(reminderTime -> {
                     ReminderTime updated = toReminderTime(request);
                     reminderTime.setDosage(updated.getDosage());
@@ -47,7 +54,7 @@ public class ReminderTimeService {
     }
 
     public boolean delete(Long id) {
-        if (!reminderTimeRepository.existsById(id)) {
+        if (findById(id).isEmpty()) {
             return false;
         }
         reminderTimeRepository.deleteById(id);
@@ -55,7 +62,7 @@ public class ReminderTimeService {
     }
 
     private ReminderTime toReminderTime(ReminderTimeRequest request) {
-        Reminder reminder = reminderRepository.findById(request.reminderId())
+        Reminder reminder = reminderRepository.findByReminderIdAndUser(request.reminderId(), currentUserService.get())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reminder not found"));
         return new ReminderTime(request.dosage(), reminder, request.timeOfDay());
     }

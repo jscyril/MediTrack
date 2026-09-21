@@ -17,6 +17,7 @@
 - [x] Replace generated authentication with password-backed HTTP Basic
 - [x] Add JWT authentication
 - [x] Add endpoint integration coverage
+- [x] Enforce ownership of user data
 - [x] Move database credentials to environment configuration
 - [x] Add due-reminder query groundwork
 - [ ] Add notification delivery channel

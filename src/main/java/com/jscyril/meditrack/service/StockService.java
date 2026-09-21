@@ -19,29 +19,33 @@ public class StockService {
     private final StockRepository stockRepository;
     private final UserRepository userRepository;
     private final MedRepository medRepository;
+    private final CurrentUserService currentUserService;
 
-    public StockService(StockRepository stockRepository, UserRepository userRepository, MedRepository medRepository) {
+    public StockService(StockRepository stockRepository, UserRepository userRepository, MedRepository medRepository,
+                        CurrentUserService currentUserService) {
         this.stockRepository = stockRepository;
         this.userRepository = userRepository;
         this.medRepository = medRepository;
+        this.currentUserService = currentUserService;
     }
 
     public Stock create(StockRequest request) {
-        return stockRepository.save(toStock(request));
+        return stockRepository.save(toStock(request, currentUserService.get()));
     }
 
     public List<Stock> findAll() {
-        return stockRepository.findAll();
+        return stockRepository.findAllByUser(currentUserService.get());
     }
 
     public Optional<Stock> findById(Long id) {
-        return stockRepository.findById(id);
+        return stockRepository.findByStockIdAndUser(id, currentUserService.get());
     }
 
     public Stock update(Long id, StockRequest request) {
-        return stockRepository.findById(id)
+        User user = currentUserService.get();
+        return stockRepository.findByStockIdAndUser(id, user)
                 .map(stock -> {
-                    Stock updated = toStock(request);
+                    Stock updated = toStock(request, user);
                     stock.setQuantity(updated.getQuantity());
                     stock.setExpiryDate(updated.getExpiryDate());
                     stock.setUser(updated.getUser());
@@ -52,16 +56,14 @@ public class StockService {
     }
 
     public boolean delete(Long id) {
-        if (!stockRepository.existsById(id)) {
+        if (findById(id).isEmpty()) {
             return false;
         }
         stockRepository.deleteById(id);
         return true;
     }
 
-    private Stock toStock(StockRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    private Stock toStock(StockRequest request, User user) {
         Medicine medicine = medRepository.findById(request.medicineId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicine not found"));
         return new Stock(request.quantity(), request.expiryDate(), user, medicine);

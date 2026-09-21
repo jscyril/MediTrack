@@ -8,7 +8,6 @@ import java.time.LocalDate;
 public record StockRequest(
         @PositiveOrZero int quantity,
         @NotNull LocalDate expiryDate,
-        @NotNull Long userId,
         @NotNull Long medicineId
 ) {
 }
