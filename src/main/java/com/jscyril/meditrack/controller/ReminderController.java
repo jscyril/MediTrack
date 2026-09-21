@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,6 +35,13 @@ public class ReminderController {
     @GetMapping
     public List<Reminder> findAll() {
         return reminderService.findAll();
+    }
+
+    @GetMapping("/due")
+    public List<Reminder> findDueOn(
+            @org.springframework.web.bind.annotation.RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return reminderService.findDueOn(date == null ? LocalDate.now() : date);
     }
 
     @GetMapping("/{id}")

@@ -18,5 +18,6 @@
 - [x] Add JWT authentication
 - [x] Add endpoint integration coverage
 - [x] Move database credentials to environment configuration
-- [ ] Add scheduling/notifications
+- [x] Add due-reminder query groundwork
+- [ ] Add notification delivery channel
 - [ ] Add a frontend

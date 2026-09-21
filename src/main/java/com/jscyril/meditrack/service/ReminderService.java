@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Service
 public class ReminderService {
@@ -37,6 +38,10 @@ public class ReminderService {
 
     public Optional<Reminder> findById(Long id) {
         return reminderRepository.findById(id);
+    }
+
+    public List<Reminder> findDueOn(LocalDate date) {
+        return reminderRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date);
     }
 
     public Reminder update(Long id, ReminderRequest request) {
