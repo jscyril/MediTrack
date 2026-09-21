@@ -15,7 +15,7 @@
 - [x] Add stock tracking
 - [x] Add health-log CRUD
 - [x] Replace generated authentication with password-backed HTTP Basic
-- [ ] Add JWT authentication
+- [x] Add JWT authentication
 - [ ] Move database credentials to environment configuration
 - [ ] Add scheduling/notifications
 - [ ] Add a frontend

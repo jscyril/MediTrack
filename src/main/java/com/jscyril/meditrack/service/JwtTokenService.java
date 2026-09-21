@@ -1,0 +1,35 @@
+package com.jscyril.meditrack.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+
+@Service
+public class JwtTokenService {
+    private final JwtEncoder jwtEncoder;
+    private final long expirationSeconds;
+
+    public JwtTokenService(JwtEncoder jwtEncoder,
+                           @Value("${app.jwt.expiration-seconds}") long expirationSeconds) {
+        this.jwtEncoder = jwtEncoder;
+        this.expirationSeconds = expirationSeconds;
+    }
+
+    public String createToken(String username) {
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(username)
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expirationSeconds))
+                .build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public long getExpirationSeconds() {
+        return expirationSeconds;
+    }
+}
