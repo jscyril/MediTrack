@@ -12,8 +12,8 @@
 
 - [x] Add reminder CRUD
 - [x] Add reminder times
-- [ ] Add stock tracking
-- [ ] Add health-log CRUD
+- [x] Add stock tracking
+- [x] Add health-log CRUD
 - [ ] Replace generated Spring Security auth with real user authentication/JWT
 - [ ] Move database credentials to environment configuration
 - [ ] Add scheduling/notifications
